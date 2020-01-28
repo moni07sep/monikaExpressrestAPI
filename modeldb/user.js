@@ -1,4 +1,7 @@
-let mongoose = require("mongoose")
+let mongoose = require("mongoose");
+let jwt=require("jsonwebtoken");
+let config =require("config");
+//let config = require("config");
 
 let usersechma=new mongoose.Schema({
     firstname:{type:String ,min:4 ,max:5 ,trim :true ,required:true},
@@ -13,6 +16,12 @@ let usersechma=new mongoose.Schema({
         password:{type:String, required:true, min:4, max:15}
     }
 })
+
+usersechma.methods.Tokenperson=function(){
+    let token = jwt.sign({_id:this._id},config.get("moniapi") );
+    return token;
+}
+
 
 let userModel= mongoose.model("users",usersechma)
 

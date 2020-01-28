@@ -2,6 +2,11 @@ let express= require("express")
 let mongoose = require("mongoose")
 let app=express();
 app.use(express.json());
+let config=require("config");
+if (!config.get("moniapi")) {
+    console.log("ACCESS DENIED! NO TOKEN FOUND IN ENV");
+    process.exit(1);
+}
 
 let port =process.env.PORT || 4600;
 let user =require("./routes/user.routes");

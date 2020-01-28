@@ -1,9 +1,11 @@
 let express= require("express");
 let joi=require("@hapi/joi")
 let router =express.Router();
+let bcrypt =require("bcrypt");
 let User =require("../modeldb/user")
 //update
 router.put("/userupdate/:id", async (req,res)=>{
+
 let user=await User.findById(req.params.id);
 if (!user){return res.status(404).send({ message: "Invalid user id" })}
 let{error}=userValidataionError(req.body);
@@ -35,9 +37,9 @@ router.delete("/userdelete/:id",async(req,res)=>{
 //insert
 
 router.post("/createnewuser", async(req,res)=>  {
-
-    let user= await User.findOne({"userLogin.emailid":req.body.emailid});
-    if(!user) {return res.status(403).send({message:"already exist"})}
+   
+    let user1= await User.findOne({"userLogin.emailid":req.body.userLogin.emailid});
+    if(user1) {return res.status(403).send({message:"already1 exist"})}
     let {error}=userValidataionError(req.body);
     if(error){return res.send(error.details[0].message)};
     let {firstname,lastname,adress,userLogin}=req.body;
@@ -48,6 +50,9 @@ router.post("/createnewuser", async(req,res)=>  {
         userLogin
     });
     
+    let salt= await bcrypt.genSalt(10);
+    newUser.userLogin.password=await bcrypt.hash(newUser.userLogin.password,salt)
+
     // let newuser =new User({
     //     firstname:req.body.firstname,
     //     lastname:req.body.lastname,
