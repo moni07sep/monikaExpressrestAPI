@@ -1,7 +1,7 @@
 let mongoose = require("mongoose");
 let jwt=require("jsonwebtoken");
 let config =require("config");
-//let config = require("config");
+let joi=require("@hapi/joi")
 
 let usersechma=new mongoose.Schema({
     firstname:{type:String ,min:4 ,max:5 ,trim :true ,required:true},
@@ -22,7 +22,26 @@ usersechma.methods.Tokenperson=function(){
     return token;
 }
 
+function userValidataionError(error){
+
+    let schema=joi.object({
+        firstname:joi.string().min(4).max(10).required(),
+        lastname:joi.string().min(4).max(10).required(),
+    adress:{
+        country:joi.string().required(),
+        state:joi.string().required(),
+        city:joi.string().required()   
+    },
+    userLogin:{
+        emailid:joi.string().required(),
+        password:joi.string().min(4).max(15).required()
+    }
+
+    })
+    return schema.validate(error)
+}
+
 
 let userModel= mongoose.model("users",usersechma)
 
-module.exports=userModel;
+module.exports={userValidataionError,userModel};

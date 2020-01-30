@@ -7,7 +7,7 @@ let config=require("config")
 let User=require("../../modeldb/user");
 
 router.post("/auth",async(req,res)=>{
-    let email =await User.findOne({"userLogin.emailid":req.body.userLogin.emailid});
+    let email =await User.userModel.findOne({"userLogin.emailid":req.body.userLogin.emailid});
     if(!email) {res.status(403).send({message:"invalid email"})};
     let password=await bcrypt.compare(req.body.userLogin.password,email.userLogin.password);
     //let password =await User.findOne({"userLogin.password":req.body.userLogin.password});

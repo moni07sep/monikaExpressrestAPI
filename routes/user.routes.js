@@ -1,14 +1,13 @@
 let express= require("express");
-let joi=require("@hapi/joi")
 let router =express.Router();
 let bcrypt =require("bcrypt");
 let User =require("../modeldb/user")
 //update
 router.put("/userupdate/:id", async (req,res)=>{
 
-let user=await User.findById(req.params.id);
+let user=await User.userModel.findById(req.params.id);
 if (!user){return res.status(404).send({ message: "Invalid user id" })}
-let{error}=userValidataionError(req.body);
+let{error}=User.userValidataionError(req.body);
 if (error) { return res.send(error.details[0].message) };
 //let {firstname,lastname,adress,userLogin}=req.body;
 
@@ -20,7 +19,7 @@ user.adress.state=req.body.adress.state,
 user.userLogin.emailid=req.body.userLogin.emailid,
 user.userLogin.password=req.body.userLogin.password    
 
-let data=await user.save();
+let data=await  User.userModel.save();
 res.send({ d: data });
 
 })
@@ -29,7 +28,7 @@ res.send({ d: data });
 //delete
 
 router.delete("/userdelete/:id",async(req,res)=>{
-    let user =await User.findByIdAndRemove(req.params.id);
+    let user =await User.userModel.findByIdAndRemove(req.params.id);
     if(!user) {return res.status(403).send({message:"invalid id"})}
     res.send({ message: "Thank you ! come back again " });
 })
@@ -38,9 +37,9 @@ router.delete("/userdelete/:id",async(req,res)=>{
 
 router.post("/createnewuser", async(req,res)=>  {
    
-    let user1= await User.findOne({"userLogin.emailid":req.body.userLogin.emailid});
+    let user1= await User.userModel.findOne({"userLogin.emailid":req.body.userLogin.emailid});
     if(user1) {return res.status(403).send({message:"already1 exist"})}
-    let {error}=userValidataionError(req.body);
+    let {error}=User.userValidataionError(req.body);
     if(error){return res.send(error.details[0].message)};
     let {firstname,lastname,adress,userLogin}=req.body;
     let newUser = new User({
@@ -69,27 +68,10 @@ router.post("/createnewuser", async(req,res)=>  {
 })
 
 router.get("/fetchuser",async(req,res)=>{
-    let data =await User.find();
+    let data =await User.userModel.find();
     res.send(console.log(data))
 
 })
 
-function userValidataionError(error){
 
-    let schema=joi.object({
-        firstname:joi.string().min(4).max(10).required(),
-        lastname:joi.string().min(4).max(10).required(),
-    adress:{
-        country:joi.string().required(),
-        state:joi.string().required(),
-        city:joi.string().required()   
-    },
-    userLogin:{
-        emailid:joi.string().required(),
-        password:joi.string().min(4).max(15).required()
-    }
-
-    })
-    return schema.validate(error)
-}
 module.exports = router;
